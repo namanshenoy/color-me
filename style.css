@@ -32,7 +32,7 @@ button:focus, textarea:focus, input:focus {
     text-align: center;
 }
 #screen-select button {
-    margin: 0 30px;
+    margin: 0 22px;
     height: 2vh;
     width: 2vh;
     border-radius: 50%;
@@ -44,6 +44,9 @@ button:focus, textarea:focus, input:focus {
     color: rgba(255, 255, 255, 0.3);
     transition: 0.5s;
 }
+#screen-select svg:hover {
+    color: rgba(255, 255, 255, 0.6);
+}
 
 #screen-select button:nth-child(1) svg {
     color: white;
@@ -53,6 +56,15 @@ button:focus, textarea:focus, input:focus {
     height: 23vh;
     text-align: center;
     padding-top: 6vh;
+}
+#user-input, #text-analysis, #history, #color-settings {
+    display: none;
+}
+
+#title {
+    padding: 30px 20vw;
+    font-family: serif;
+    font-style: italic;
 }
 
 #text-analysis div {
@@ -69,9 +81,6 @@ button:focus, textarea:focus, input:focus {
     color: #b5b5b5;
 }
 
-#user-input {
-    display: none;
-}
 #user-input div span {
     padding: 0 20px;
 }
@@ -85,6 +94,17 @@ button:focus, textarea:focus, input:focus {
 #previous-emotions {
     display: flex;
     padding: 0 5vw;
+}
+#history button {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin-top: 15px;
+    padding: 6px;
+    font-size: 10px;
+    border: none;
+    transition: 0.3s;
+}
+#history button:hover {
+    background-color: rgba(255, 255, 255, 0.4);
 }
 .emotional-snapshot {
     width: 30px;
