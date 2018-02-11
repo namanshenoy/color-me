@@ -1,6 +1,10 @@
 body {
     color: white;
 }
+p {
+    font-size: 12px;
+}
+
 button:focus, textarea:focus, input:focus {
     outline: 0;
 }
