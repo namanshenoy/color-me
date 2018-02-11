@@ -12,6 +12,7 @@
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
   crossorigin="anonymous"></script>
         <script src="jscolor-2.0.4/jscolor.js"></script>
+        <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Montserrat|Sacramento" rel="stylesheet">
         
     </head>
@@ -24,51 +25,91 @@
         
         <div id="screen-select" class="row">
             <div class="cute-12">
-                <button id="title-screen-button" onclick="showTitle()"></button>
-                <button id="analysis-screen-button" onclick="showAnalysis()"></button>
-                <button id="input-screen-button" onclick="showInputs()"></button>
-                <button id="settings-screen-button"  onclick="showSettings()"></button>
+                <button onclick="showTitle()">
+                    <i id="title-screen-button" class="fas fa-question-circle"></i>
+                </button>
+                <button onclick="showAnalysis()">
+                    <i id="analysis-screen-button" class="fas fa-comment"></i>
+                </button>
+                <button onclick="showInputs()">
+                    <i id="input-screen-button" class="fas fa-sliders-h"></i>
+                </button>
+                <button onclick="showHistory()">
+                    <i id="history-screen-button" class="fas fa-history"></i>
+                </button>
+                <button onclick="showSettings()">
+                    <i id="settings-screen-button" class="fas fa-cog"></i>
+                </button>
             </div>
         </div>
         
         <div id="title" class="row">
-            <div class="cute-12">
-                <h2>COLOR ME #RRGGBB</h2>
+            <div class="cute-100">
+                <p></p>
             </div>
         </div>
         
         <div id="text-analysis" class="row">
-            <div class="cute-12">
+            <div class="cute-100">
                 <textarea placeholder="Tell me about your day."></textarea>
             </div>
         </div>
         
         <div id="user-input" class="row">
-            <div class="cute-12">
+            <div class="cute-100">
                 <p>Tell me how you're feeling.</p>
                 <span>:(</span><input id="feelings-input" type="range" min="0" max="1" step="any" value="0.5" onchange="updateColor()"><span>:)</span>
             </div> 
         </div>
         
-        <div id="color-settings" class="row">
-            <div class="cute-6-tablet">
-                <p>What's a good color?</p>
-                <input id="good-color-input" class="jscolor {hash:true}" onchange="updateColor()" value="FF9FAB">
+        <div id="history" class="row" onload="history()">
+            <div id="previous-emotions" class="cute-11-phone">
             </div>
-            <div class="cute-6-tablet">
-                <p>What's a bad color?</p>
-                <input id="bad-color-input" class="jscolor {hash:true}" value="3E4E84" onchange="updateColor()">
+            <div class="cute-1-phone">
+                <button onclick="updateHistory()">Add a new entry!</button>
             </div>
         </div>
-
         
-
+        <div id="color-settings" class="row">
+            <div class="cute-6-phone">
+                <p>What's your happy color?</p>
+                <input id="good-color-input" class="jscolor {hash:true}" onchange="updateColor()" value="#FF9FAB">
+            </div>
+            <div class="cute-6-phone">
+                <p>What's your unhappy color?</p>
+                <input id="bad-color-input" class="jscolor {hash:true}" value="#3E4E84" onchange="updateColor()">
+            </div>
+        </div>
         
         <script type="text/javascript">
-            
             var positiveMultiplier = document.getElementById('feelings-input').value;
             var goodColor = document.getElementById('good-color-input').value;
             var badColor = document.getElementById('bad-color-input').value;
+            
+            var emotions = [0.8, 0.9, 0.75, 0.4, 0.45];
+            
+            function setUpHistory() {
+                var allEmotions = document.getElementsByClassName('emotional-snapshot');
+                while(allEmotions.length > 0){
+                    allEmotions[0].parentNode.removeChild(allEmotions[0]);
+                }
+                
+                var parent = document.getElementById('previous-emotions');
+                for (var i = 0; i < emotions.length; i++) {
+                    var newEmotion = document.createElement('div');
+                    newEmotion.className = 'emotional-snapshot';
+                    newEmotion.style.backgroundColor = colorCalc(emotions[i]);
+                    parent.appendChild(newEmotion);
+                }
+            }
+            
+            function updateHistory() {
+                emotions.push(positiveMultiplier);
+                var newEmotion = document.createElement('div');
+                newEmotion.className = 'emotional-snapshot';
+                newEmotion.style.backgroundColor = colorCalc(positiveMultiplier);
+                document.getElementById('previous-emotions').appendChild(newEmotion);
+            }
             
             function updatePositivity() {
                 positiveMultiplier = document.getElementById('feelings-input').value;
@@ -84,6 +125,21 @@
                 updatePositivity();
                 updateGoodColor();
                 updateBadColor();
+                
+                var color = colorCalc(positiveMultiplier) 
+                
+                document.getElementById('main-text').style.backgroundColor = color;
+                document.getElementById('screen-select').style.backgroundColor = color;
+                document.getElementById('title').style.backgroundColor = color;
+                document.getElementById('text-analysis').style.backgroundColor = color;
+                document.getElementById('user-input').style.backgroundColor = color;
+                document.getElementById('history').style.backgroundColor = color;
+                document.getElementById('color-settings').style.backgroundColor = color;
+                
+                document.getElementById('main-text').innerHTML = "<h1>I'm feeling <span>" + color + "</span> today.</h1>";
+            }
+            
+            function colorCalc(multiplier) {
                 // Algorithm credit to: https://stackoverflow.com/questions/14482226/how-can-i-get-the-color-halfway-between-two-colors and https://www.programming-idioms.org/idiom/154/halfway-between-two-hex-color-codes
                 
                 // Separate the good and bad colors to their r,g,b components
@@ -105,8 +161,8 @@
                 b2 = parseInt(b2, 16);
                 
                 // Average
-                var pos = positiveMultiplier;
-                var neg = 1- positiveMultiplier;
+                var pos = multiplier;
+                var neg = 1 - multiplier;
                 
                 var r = Math.floor((r1 * pos) + (r2 * neg));
                 var g = Math.floor((g1 * pos) + (g2 * neg));
@@ -128,16 +184,7 @@
                     b = "0" + b;
                 }
                 
-                var color = "#" + r + g + b;
-                
-                document.getElementById('main-text').style.backgroundColor = color;
-                document.getElementById('screen-select').style.backgroundColor = color;
-                document.getElementById('title').style.backgroundColor = color;
-                document.getElementById('text-analysis').style.backgroundColor = color;
-                document.getElementById('user-input').style.backgroundColor = color;
-                document.getElementById('color-settings').style.backgroundColor = color;
-                
-                document.getElementById('main-text').innerHTML = "<h1>I'm feeling <span>" + color + "</span> today.</h1>";
+                return ("#" + r + g + b);
             }
             
             
@@ -145,41 +192,63 @@
                 document.getElementById('title').style.display = 'block';
                 document.getElementById('text-analysis').style.display = 'none';
                 document.getElementById('user-input').style.display = 'none';
+                document.getElementById('history').style.display = 'none';
                 document.getElementById('color-settings').style.display = 'none';
-                document.getElementById('title-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 1)';
-                document.getElementById('analysis-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('input-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('settings-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
             }
             function showAnalysis() {
                 document.getElementById('title').style.display = 'none';
                 document.getElementById('text-analysis').style.display = 'block';
                 document.getElementById('user-input').style.display = 'none';
+                document.getElementById('history').style.display = 'none';
                 document.getElementById('color-settings').style.display = 'none';
-                document.getElementById('title-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('analysis-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 1)';
-                document.getElementById('input-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('settings-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+                document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
             }
             function showInputs() {
                 document.getElementById('title').style.display = 'none';
                 document.getElementById('text-analysis').style.display = 'none';
                 document.getElementById('user-input').style.display = 'block';
+                document.getElementById('history').style.display = 'none';
                 document.getElementById('color-settings').style.display = 'none';
-                document.getElementById('title-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('analysis-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('input-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 1)';
-                document.getElementById('settings-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+                document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+            }
+            function showHistory() {
+                setUpHistory();
+                
+                document.getElementById('title').style.display = 'none';
+                document.getElementById('text-analysis').style.display = 'none';
+                document.getElementById('user-input').style.display = 'none';
+                document.getElementById('history').style.display = 'block';
+                document.getElementById('color-settings').style.display = 'none';
+                document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+                document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
             }
             function showSettings() {
                 document.getElementById('title').style.display = 'none';
                 document.getElementById('text-analysis').style.display = 'none';
                 document.getElementById('user-input').style.display = 'none';
+                document.getElementById('history').style.display = 'none';
                 document.getElementById('color-settings').style.display = 'block';
-                document.getElementById('title-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('analysis-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('input-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('settings-screen-button').style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 1)';
             }
         </script>
     

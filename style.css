@@ -6,7 +6,7 @@ button:focus, textarea:focus, input:focus {
 }
 
 #main-text {
-    height: 83vh;
+    height: 75vh;
     width: 100vw;
     text-align: center;
     background-color: #FF9FAB;
@@ -15,7 +15,7 @@ button:focus, textarea:focus, input:focus {
 #main-text h1 {
     font-family: 'Sacramento', cursive;
     font-size: 12vmin;
-    padding-top: 12vh;
+    padding-top: 10vh;
 }
 
 #main-text span {
@@ -32,23 +32,27 @@ button:focus, textarea:focus, input:focus {
     text-align: center;
 }
 #screen-select button {
-    margin: 0 5vw;
+    margin: 0 30px;
     height: 2vh;
     width: 2vh;
     border-radius: 50%;
     border: none;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0);
+}
+
+#screen-select svg {
+    color: rgba(255, 255, 255, 0.3);
     transition: 0.5s;
 }
 
-#screen-select button:nth-child(1) {
-    background-color: white;
+#screen-select button:nth-child(1) svg {
+    color: white;
 }
 
-#title, #user-input, #text-analysis, #color-settings {
-    height: 15vh;
+#title, #user-input, #text-analysis, #history, #color-settings {
+    height: 23vh;
     text-align: center;
-    padding-top: 2vh;
+    padding-top: 6vh;
 }
 
 #text-analysis div {
@@ -59,6 +63,7 @@ button:focus, textarea:focus, input:focus {
     height: 10vh;
     width: 50%;
     color: #7c7c7c;
+    font-size: 12px;
 }
 #text-analysis textarea::placeholder {
     color: #b5b5b5;
@@ -75,6 +80,17 @@ button:focus, textarea:focus, input:focus {
     vertical-align: middle;
     width: 30%;
     margin-top: 10px;
+}
+
+#previous-emotions {
+    display: flex;
+    padding: 0 5vw;
+}
+.emotional-snapshot {
+    width: 30px;
+    height: 30px;
+    margin: 0 5px;
+    border: 1px solid white;
 }
 
 #good-color-input, #bad-color-input {
