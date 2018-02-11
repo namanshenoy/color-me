@@ -28,9 +28,11 @@
                 <button onclick="showTitle()">
                     <i id="title-screen-button" class="fas fa-question-circle"></i>
                 </button>
+<!--
                 <button onclick="showAnalysis()">
                     <i id="analysis-screen-button" class="fas fa-comment"></i>
                 </button>
+-->
                 <button onclick="showInputs()">
                     <i id="input-screen-button" class="fas fa-sliders-h"></i>
                 </button>
@@ -46,7 +48,7 @@
         <div id="title" class="row">
             <div class="cute-100">
                 <p>Express yourself with the romantic language of hexademical color codes.</p>
-                <p>Through text analysis or manual emotion input, visualize your emotional journey with color.</p>
+                <p>Record your moods periodically and visualize your emotional journey with color.</p>
             </div>
         </div>
         
@@ -59,7 +61,7 @@
         <div id="user-input" class="row">
             <div class="cute-100">
                 <p>Tell me how you're feeling.</p>
-                <span>:(</span><input id="feelings-input" type="range" min="0" max="1" step="any" value="0.5" onchange="updateColor()"><span>:)</span>
+                <span><i class="far fa-frown"></i></span><input id="feelings-input" type="range" min="0" max="1" step="any" value="0.5" oninput="updateColor()"><span><i class="far fa-smile"></i></span>
             </div> 
         </div>
         
@@ -199,7 +201,7 @@
                 document.getElementById('history').style.display = 'none';
                 document.getElementById('color-settings').style.display = 'none';
                 document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 1)';
-                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
@@ -211,7 +213,7 @@
                 document.getElementById('history').style.display = 'none';
                 document.getElementById('color-settings').style.display = 'none';
                 document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+                //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 1)';
                 document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
@@ -223,7 +225,7 @@
                 document.getElementById('history').style.display = 'none';
                 document.getElementById('color-settings').style.display = 'none';
                 document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 1)';
                 document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
@@ -237,7 +239,7 @@
                 document.getElementById('history').style.display = 'block';
                 document.getElementById('color-settings').style.display = 'none';
                 document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 1)';
                 document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
@@ -249,7 +251,7 @@
                 document.getElementById('history').style.display = 'none';
                 document.getElementById('color-settings').style.display = 'block';
                 document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
-                document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+                //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
                 document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 1)';
