@@ -8,6 +8,7 @@ const moment = require('moment')
 const {  
   Stitch, 
   UserPasswordCredential,
+  UserPasswordAuthProviderClient
 } = require('mongodb-stitch-server-sdk')
 
 const APP_ID = 'test1-sspul'
@@ -29,7 +30,7 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
   try {
-    console.log(req.body)
+    // console.log(req.body)
     // consol
     axios.post('https://webhooks.mongodb-stitch.com/api/client/v2.0/app/test1-sspul/service/mood_rest/incoming_webhook/add_mood', {
       owner_id: req.body.owner_id,
@@ -38,10 +39,10 @@ app.post('/', (req, res) => {
     }).then(x => {
       res.send({ status: 'success' })
     })
-    .catch(e => res.status(404).send({ status: 'error', error: e }))
+    .catch(e => res.status(404).send({ status: 'error', error: e || "some error occured!" }))
   } catch (e) {
     console.error(e)
-    res.status(500).send({ error: e })
+    res.status(500).send({ error: e || "some error occured!" })
   }
 })
 
@@ -65,8 +66,28 @@ app.post('/login', (req, res) => {
           })
         })
         .catch(e => {
-          res.status(401).send({status: 'error', message: e.message})
+          res.status(401).send({status: 'error', message: e.message || "some error occured!"})
         })
+      }
+    } catch (e) {
+      console.error(e)
+      res.status(500).send({ status: 'error', message: e || "some error occured!" })
+    }
+})
+
+app.post('/register', (req, res) => {
+  try {
+    const body = req.body
+    if (!body.username || !body.password || !body.confirm_password) {
+      res.status(400).send({ status: 'error', message: 'Please send username, password and confirm password!' })   
+    } else if (body.password !== body.confirm_password){
+      res.status(400).send({ status: 'error', message: 'Confirm password and password must be the same!' })   
+    } else {
+      const emailPasswordClient = StitchApp.auth.getProviderClient(UserPasswordAuthProviderClient.factory);
+    
+      emailPasswordClient.registerWithEmail(body.username, body.password)
+        .then(() => res.send({ status: 'success' }))
+        .catch((e) => res.send({ status: 'error', message: 'Some error occured!' }));
       }
     } catch (e) {
       console.error(e)
