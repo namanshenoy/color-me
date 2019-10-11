@@ -1,19 +1,21 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
+const axios = require('axios')
+const moment = require('moment')
 
 
 const {  
   Stitch, 
   UserPasswordCredential,
-} = require('mongodb-stitch-server-sdk');
+} = require('mongodb-stitch-server-sdk')
 
 const APP_ID = 'test1-sspul'
 const StitchApp = Stitch.initializeDefaultAppClient(APP_ID)
 
 const PORT = process.env.PORT || 8081
 
-const app = express();
+const app = express()
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -28,7 +30,15 @@ app.get('/', (req, res) => {
 app.post('/', (req, res) => {
   try {
     console.log(req.body)
-    res.send({ status: 'done' })
+    // consol
+    axios.post('https://webhooks.mongodb-stitch.com/api/client/v2.0/app/test1-sspul/service/mood_rest/incoming_webhook/add_mood', {
+      owner_id: req.body.owner_id,
+      date: moment().format('YYYY-MM-DD'),
+      mood_hex: req.body.mood_hex
+    }).then(x => {
+      res.send({ status: 'success' })
+    })
+    .catch(e => console.error(e))
   } catch (e) {
     res.status(500).send({ error: e })
   }
@@ -53,12 +63,32 @@ app.post('/login', (req, res) => {
             }
           })
         })
-        .catch(e => console.error(e))
+        .catch(e => {
+          res.status(401).send({status: 'error', message: e.message})
+          console.error(e)
+        })
     }
   } catch (e) {
     res.status(500).send({ error: e })
   }
 })
+
+app.get('/emotions', (req, res) => {
+  try {
+    const body = req.query
+    if (!body.id) {
+      res.status(400).send({ error: 'Error: Please try logging in again!' })   
+    } else {
+      axios.get('https://webhooks.mongodb-stitch.com/api/client/v2.0/app/test1-sspul/service/mood_rest/incoming_webhook/get_moods?owner_id=' + body.id)
+      .then(r => {
+        res.send(r.data)
+      })
+    }
+  } catch (e) {
+    res.status(500).send({ error: e })
+  }
+})
+
 app.listen(PORT, () => {
   console.log('Listening on: ' + PORT)
 })
