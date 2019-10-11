@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <title>#mood</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/lib/cute-grids/css/normalize.css">
+  <link rel="stylesheet" href="/static/lib/cute-grids/css/cutegrids.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="http://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/static/lib/jscolor-2.0.4/jscolor.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat|Sacramento" rel="stylesheet">
+
+  <link rel="shortcut icon" href="/static/poundSignHeart.ico">
+
+</head>
+
+<body onload="startup()">
+  <!-- <div class="snackbar">HELLO THERE </div> -->
+  <div class="row" class="cute-12-laptop">
+    <div id="login-area">
+        <button id="login-area-login-empty" class="login-area-button" disabled> </button>
+        <button id="login-area-register" class="login-area-button" onclick="showRegisterArea()">Register</button>
+        <button id="login-area-login" class="login-area-button" onclick="showLoginArea()">Log In</button>
+        <button id="login-area-logout" class="login-area-button" onclick="attemptLogout()">Log Out</button>
+        <div class="login-area-box-hidden" id="login-area-box">
+          <input class="login-area-input" id="login-area-input-username" type="email" placeholder="username (email)"/>
+          <br>
+          <input class="login-area-input" id="login-area-input-password" type="password" placeholder="password"/>
+          <br>
+          <button id="login-area-run-login" class="login-area-button" onclick="attemptLogin()">Log In</button>
+        </div>
+        <div class="register-area-box-hidden" id="register-area-box">
+          <input class="login-area-input" id="login-area-input-register-email" type="email" placeholder="username (email)"/>
+          <br>
+          <input class="login-area-input" id="login-area-input-register-password" type="password" placeholder="password"/>
+          <br>
+          <input class="login-area-input" id="login-area-input-register-password-confirm" type="password" placeholder="confirm password"/>
+          <br>
+          <button id="login-area-run-register" class="login-area-button" onclick="attemptRegister()">Register</button>
+        </div>
+    </div>
+  </div>
+  <div class="row">
+    <div id="main-text" class="cute-12-laptop">
+      <h1>I'm feeling <span>#FFC0CB</span> today.</h1>
+    </div>
+  </div>
+
+  <div id="screen-select" class="row">
+    <div class="cute-12">
+      <button onclick="showTitle()">
+        <i id="title-screen-button" class="fas fa-question-circle"></i>
+      </button>
+      <!--
+                <button onclick="showAnalysis()">
+                    <i id="analysis-screen-button" class="fas fa-comment"></i>
+                </button>
+-->
+      <button onclick="showInputs()">
+        <i id="input-screen-button" class="fas fa-sliders-h"></i>
+      </button>
+      <button onclick="showHistory()">
+        <i id="history-screen-button" class="fas fa-history"></i>
+      </button>
+      <button onclick="showSettings()">
+        <i id="settings-screen-button" class="fas fa-cog"></i>
+      </button>
+    </div>
+  </div>
+
+  <div id="title" class="row">
+    <div class="cute-100">
+      <p>Express yourself with the romantic language of hexademical color codes.</p>
+      <p>#mood ("pound sign mood", none of that hashtag nonsense) allows you to visualize the progression of your mood
+        over time using colors.</p>
+      <p>Made by Da-In Ryoo (2018), who's feeling like a #F8AD92 today.</p>
+    </div>
+  </div>
+
+  <div id="text-analysis" class="row">
+    <div class="cute-100">
+      <textarea placeholder="Tell me about your day."></textarea>
+    </div>
+  </div>
+
+  <div id="user-input" class="row">
+    <div class="cute-100">
+      <p>Tell me how you're feeling.</p>
+      <span><i class="far fa-frown"></i></span><input id="feelings-input" type="range" min="0" max="1" step="any"
+        value="0.5" oninput="updateColor()"><span><i class="far fa-smile"></i></span>
+        <br>
+      <button class="ripple-button" onclick="updateHistory()">Add current mood</button>
+    </div>
+  </div>
+  
+  <div id="history" class="row" onload="history()">
+      <div class="cute-100">
+        <div id="previous-emotions" class="row">
+        </div>
+        <div class="row">
+          <button class="ripple-button" onclick="updateHistory()">Add current mood</button>
+        </div>
+    </div>
+  </div>
+
+  <div id="color-settings" class="row">
+    <div class="cute-6-phone">
+      <p>What's your happy color?</p>
+      <input id="good-color-input" class="jscolor {hash:true}" onchange="updateColor()" value="#FF9FAB">
+    </div>
+    <div class="cute-6-phone">
+      <p>What's your unhappy color?</p>
+      <input id="bad-color-input" class="jscolor {hash:true}" value="#3E4E84" onchange="updateColor()">
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var positiveMultiplier = document.getElementById('feelings-input').value;
+    var goodColor = document.getElementById('good-color-input').value;
+    var badColor = document.getElementById('bad-color-input').value;
+    var emotions = [];
+
+    const loginButton = document.getElementById('login-area-login');
+    const registerButton = document.getElementById('login-area-register');
+    const logoutButton = document.getElementById('login-area-logout');
+
+    function launchSnackbar(message, type) {
+      const body = document.getElementsByTagName('body')[0];
+      const snackbar = document.createElement('div');
+      snackbar.innerHTML = message;
+      snackbar.className = 'snackbar';
+      if (type === 'error') {
+        snackbar.className = 'snackbar snackbar-error';
+      }
+      body.prepend(snackbar);
+      setTimeout(() => snackbar.outerHTML = "", 3000)
+    }
+
+    async function setUpHistory() {
+      // alert('Setting Up!')
+      if (!localStorage.getItem('id') || !localStorage.getItem('email')) {
+        emotions = emotions.length === 0 ? [0.8, 0.9, 0.75, 0.4, 0.45] : emotions;
+      } else {
+        // emotions = [0.8, 0.9, 0.75, 0.4, 0.45];
+        const resp = await fetch('/emotions?id=' + localStorage.getItem('id'));
+        const resp_json = await resp.json();
+        // console.log(resp_json);
+        emotions = [];
+        resp_json.data.forEach(x => {
+          console.log(x.mood_hex)
+          if (x.mood_hex.$numberDouble) {
+            emotions.push(x.mood_hex.$numberDouble);
+          } else {
+            emotions.push(parseFloat(x.mood_hex));
+          }
+        });
+        console.log(emotions)
+        // emotions = [0.8, 0.9, 0.75, 0.4, 0.45];
+      }
+
+      var allEmotions = document.getElementsByClassName('emotional-snapshot');
+      while (allEmotions.length > 0) {
+        allEmotions[0].parentNode.removeChild(allEmotions[0]);
+      }
+
+      var parent = document.getElementById('previous-emotions');
+      for (var i = 0; i < emotions.length; i++) {
+        var newEmotion = document.createElement('div');
+        newEmotion.className = 'emotional-snapshot';
+        newEmotion.style.backgroundColor = colorCalc(emotions[i]);
+        parent.appendChild(newEmotion);
+      }
+    }
+
+    // https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
+    function validateEmail(email) {
+      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(email).toLowerCase());
+    }
+
+    function showRegisterArea() {
+      const loginBox = document.getElementById('login-area-box');
+      loginBox.className = 'login-area-box-hidden';
+      const registerBox = document.getElementById('register-area-box');
+      registerBox.className = 'register-area-box';
+
+      loginButton.style.display = 'none';
+      registerButton.style.display = 'none';
+      logoutButton.style.display = 'none';
+    }
+    
+
+    async function attemptRegister() {
+      const confirmPasswordBox = document.getElementById('login-area-input-register-password-confirm');
+      const passwordBox = document.getElementById('login-area-input-register-password');
+      const emailBox = document.getElementById('login-area-input-register-email');
+      const registerBox = document.getElementById('register-area-box');
+
+      if (!confirmPasswordBox.value || !passwordBox.value || !emailBox.value) {
+        launchSnackbar('Please fill in the fields!', 'error');
+        confirmPasswordBox.value = '';
+        passwordBox.value = '';
+        return;
+      } else if (!validateEmail(emailBox.value)) {
+        launchSnackbar('Please use an email in the username box!', 'error');
+        confirmPasswordBox.value = '';
+        passwordBox.value = '';
+        return;
+      } else if (confirmPasswordBox.value !== passwordBox.value) {
+        launchSnackbar('Confirm password should be equal to password!', 'error');
+        return;
+      } else {
+        const resp = await fetch('/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: emailBox.value,
+            password: passwordBox.value,
+            confirm_password: confirmPasswordBox.value
+          })
+        })
+        const resp_json = await resp.json();
+        console.log(resp_json);
+        if (resp_json.status === 'success') {
+          registerBox.className = 'login-area-box-hidden';
+          loginButton.style.display = 'inline-block';
+          registerButton.style.display = 'inline-block';
+          confirmPasswordBox.value = "";
+          passwordBox.value = "";
+          emailBox.value = "";
+          launchSnackbar('Success! Login to continue!');
+          showLoginArea();
+        } else {
+          let errorMessage = resp_json.message || 'Oops! An error occured!';
+          launchSnackbar(errorMessage.substring(0, 1).toUpperCase() + errorMessage.substring(1), 'error');
+          confirmPasswordBox.value = "";
+          passwordBox.value = "";
+        }
+      }
+
+    }
+
+    function showLoginArea() {
+      const registerBox = document.getElementById('register-area-box');
+      registerBox.className = 'login-area-box-hidden';
+
+      const loginBox = document.getElementById('login-area-box');
+      loginBox.className = 'login-area-box';
+
+      loginButton.style.display = 'none';
+      registerButton.style.display = 'none';
+      logoutButton.style.display = 'none';
+    }
+
+    async function attemptLogin() {
+      const loginInputUser = document.getElementById('login-area-input-username');
+      const loginInputPassword = document.getElementById('login-area-input-password');
+      const resp = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: loginInputUser.value,
+          password: loginInputPassword.value
+        })
+      })
+      const resp_json = await resp.json();
+      console.log(resp_json);
+      if (resp_json.status === 'success') {
+        window.localStorage.setItem('id', resp_json.data.owner_id);
+        window.localStorage.setItem('email', resp_json.data.owner_email);
+        launchSnackbar(`Welcome, ${resp_json.data.owner_email}!`);
+        const loginBox = document.getElementById('login-area-box');
+        loginBox.className = 'login-area-box-hidden';
+        logoutButton.style.display = 'inline-block';
+        setUpHistory();
+        loginInputUser.value = "";
+        loginInputPassword.value = "";
+      } else {
+        let errorMessage = resp_json.message || 'Oops! An error occured!';
+        launchSnackbar(errorMessage.substring(0, 1).toUpperCase() + errorMessage.substring(1), 'error');
+        loginInputPassword.value = "";
+      }
+    }
+
+    function attemptLogout() {
+      loginButton.style.display = 'inline-block';
+      registerButton.style.display = 'inline-block';
+      logoutButton.style.display = 'none';
+      localStorage.removeItem('id');
+      localStorage.removeItem('email');
+    }
+
+    async function updateHistory() {
+      emotions.push(positiveMultiplier);
+      const mood_hex = colorCalc(positiveMultiplier);
+      console.log(mood_hex)
+      if (localStorage.getItem('id')) {
+        const resp = await fetch('/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            owner_id: localStorage.getItem('id'),
+            mood_hex: positiveMultiplier
+          })
+        })
+        const resp_json = await resp.json();
+        console.log(resp_json);
+        if (resp_json.status === 'success') {
+          var newEmotion = document.createElement('div');
+          newEmotion.className = 'emotional-snapshot';
+          newEmotion.style.backgroundColor = mood_hex;
+          document.getElementById('previous-emotions').appendChild(newEmotion);
+          launchSnackbar('Mood added!')
+        } else {
+          launchSnackbar('An error occured!', 'error')
+        }
+      } else {
+        var newEmotion = document.createElement('div');
+        newEmotion.className = 'emotional-snapshot';
+        newEmotion.style.backgroundColor = mood_hex;
+        document.getElementById('previous-emotions').appendChild(newEmotion);
+        launchSnackbar('Mood added!')
+      }
+    }
+
+    function updatePositivity() {
+      positiveMultiplier = document.getElementById('feelings-input').value;
+    }
+    function updateGoodColor() {
+      goodColor = document.getElementById('good-color-input').value;
+    }
+    function updateBadColor() {
+      badColor = document.getElementById('bad-color-input').value;
+    }
+
+    function updateColor() {
+      updatePositivity();
+      updateGoodColor();
+      updateBadColor();
+
+      var color = colorCalc(positiveMultiplier)
+
+      document.getElementById('main-text').style.backgroundColor = color;
+      document.getElementById('screen-select').style.backgroundColor = color;
+      document.getElementById('title').style.backgroundColor = color;
+      document.getElementById('text-analysis').style.backgroundColor = color;
+      document.getElementById('user-input').style.backgroundColor = color;
+      document.getElementById('history').style.backgroundColor = color;
+      document.getElementById('color-settings').style.backgroundColor = color;
+      document.getElementById('login-area').style.backgroundColor = color;
+
+      document.getElementById('main-text').innerHTML = "<h1>I'm feeling <span>" + color + "</span> today.</h1>";
+    }
+
+    function colorCalc(multiplier) {
+      // Algorithm credit to: https://stackoverflow.com/questions/14482226/how-can-i-get-the-color-halfway-between-two-colors and https://www.programming-idioms.org/idiom/154/halfway-between-two-hex-color-codes
+
+      // Separate the good and bad colors to their r,g,b components
+      var r1 = goodColor.substring(1, 3);
+      var g1 = goodColor.substring(3, 5);
+      var b1 = goodColor.substring(5, 7);
+
+      var r2 = badColor.substring(1, 3);
+      var g2 = badColor.substring(3, 5);
+      var b2 = badColor.substring(5, 7);
+
+      // Hex to decimal
+      r1 = parseInt(r1, 16);
+      g1 = parseInt(g1, 16);
+      b1 = parseInt(b1, 16);
+
+      r2 = parseInt(r2, 16);
+      g2 = parseInt(g2, 16);
+      b2 = parseInt(b2, 16);
+
+      // Average
+      var pos = multiplier;
+      var neg = 1 - multiplier;
+
+      var r = Math.floor((r1 * pos) + (r2 * neg));
+      var g = Math.floor((g1 * pos) + (g2 * neg));
+      var b = Math.floor((b1 * pos) + (b2 * neg));
+
+      // Back to hex
+      r = r.toString(16).toUpperCase();
+      g = g.toString(16).toUpperCase();
+      b = b.toString(16).toUpperCase();
+
+      // Pad with leading zero if necessary
+      if (r.length < 2) {
+        r = "0" + r;
+      }
+      if (g.length < 2) {
+        g = "0" + g;
+      }
+      if (b.length < 2) {
+        b = "0" + b;
+      }
+
+      return ("#" + r + g + b);
+    }
+
+
+    function showTitle() {
+      document.getElementById('title').style.display = 'block';
+      document.getElementById('text-analysis').style.display = 'none';
+      document.getElementById('user-input').style.display = 'none';
+      document.getElementById('history').style.display = 'none';
+      document.getElementById('color-settings').style.display = 'none';
+      document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+      //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+    }
+    function showAnalysis() {
+      document.getElementById('title').style.display = 'none';
+      document.getElementById('text-analysis').style.display = 'block';
+      document.getElementById('user-input').style.display = 'none';
+      document.getElementById('history').style.display = 'none';
+      document.getElementById('color-settings').style.display = 'none';
+      document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+      document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+    }
+    function showInputs() {
+      document.getElementById('title').style.display = 'none';
+      document.getElementById('text-analysis').style.display = 'none';
+      document.getElementById('user-input').style.display = 'block';
+      document.getElementById('history').style.display = 'none';
+      document.getElementById('color-settings').style.display = 'none';
+      document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+      document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+    }
+    function showHistory() {
+      setUpHistory();
+
+      document.getElementById('title').style.display = 'none';
+      document.getElementById('text-analysis').style.display = 'none';
+      document.getElementById('user-input').style.display = 'none';
+      document.getElementById('history').style.display = 'block';
+      document.getElementById('color-settings').style.display = 'none';
+      document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+      document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+    }
+    function showSettings() {
+      document.getElementById('title').style.display = 'none';
+      document.getElementById('text-analysis').style.display = 'none';
+      document.getElementById('user-input').style.display = 'none';
+      document.getElementById('history').style.display = 'none';
+      document.getElementById('color-settings').style.display = 'block';
+      document.getElementById('title-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      //document.getElementById('analysis-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('input-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('history-screen-button').style.color = 'rgba(255, 255, 255, 0.3)';
+      document.getElementById('settings-screen-button').style.color = 'rgba(255, 255, 255, 1)';
+    }
+
+    function startup() {
+      updateColor();
+      if (localStorage.getItem('id') && localStorage.getItem('email')) {
+        loginButton.style.display = 'none';
+        registerButton.style.display = 'none';
+        logoutButton.style.display = 'inline-block';
+      }
+    }
+  </script>
+
+</body>
+
+</html>
