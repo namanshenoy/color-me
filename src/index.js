@@ -38,8 +38,9 @@ app.post('/', (req, res) => {
     }).then(x => {
       res.send({ status: 'success' })
     })
-    .catch(e => console.error(e))
+    .catch(e => res.status(404).send({ status: 'error', error: e }))
   } catch (e) {
+    console.error(e)
     res.status(500).send({ error: e })
   }
 })
@@ -49,7 +50,7 @@ app.post('/login', (req, res) => {
   try {
     const body = req.body
     if (!body.username || !body.password) {
-      res.status(400).send({ error: 'Please send username and password!' })   
+      res.status(400).send({ status: 'error', message: 'Please send username and password!' })   
     } else {
       const credential = new UserPasswordCredential(body.username, body.password);
       StitchApp.auth.loginWithCredential(credential)
@@ -65,19 +66,19 @@ app.post('/login', (req, res) => {
         })
         .catch(e => {
           res.status(401).send({status: 'error', message: e.message})
-          console.error(e)
         })
+      }
+    } catch (e) {
+      console.error(e)
+      res.status(500).send({ status: 'error', message: e })
     }
-  } catch (e) {
-    res.status(500).send({ error: e })
-  }
 })
 
 app.get('/emotions', (req, res) => {
   try {
     const body = req.query
     if (!body.id) {
-      res.status(400).send({ error: 'Error: Please try logging in again!' })   
+      res.status(400).send({ status: 'error', message: 'Error: Please try logging in again!' })   
     } else {
       axios.get('https://webhooks.mongodb-stitch.com/api/client/v2.0/app/test1-sspul/service/mood_rest/incoming_webhook/get_moods?owner_id=' + body.id)
       .then(r => {
@@ -85,7 +86,7 @@ app.get('/emotions', (req, res) => {
       })
     }
   } catch (e) {
-    res.status(500).send({ error: e })
+    res.status(500).send({ status: 'error', message: e })
   }
 })
 
