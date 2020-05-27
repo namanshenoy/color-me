@@ -8,8 +8,7 @@
   <link rel="stylesheet" href="/static/lib/cute-grids/css/normalize.css">
   <link rel="stylesheet" href="/static/lib/cute-grids/css/cutegrids.css">
   <link rel="stylesheet" href="/static/css/style.css">
-  <script src="http://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="/static/lib/jscolor-2.0.4/jscolor.js"></script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Montserrat|Sacramento" rel="stylesheet">
@@ -350,6 +349,7 @@
 
       var color = colorCalc(positiveMultiplier)
 
+      $('body').css('background-color', color);
       document.getElementById('main-text').style.backgroundColor = color;
       document.getElementById('screen-select').style.backgroundColor = color;
       document.getElementById('title').style.backgroundColor = color;
